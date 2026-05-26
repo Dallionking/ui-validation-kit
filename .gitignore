@@ -1,0 +1,24 @@
+# Recordings produced by validation runs (project-side)
+recordings/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log
+
+# Local installer state
+.installed-targets
+.installed-platforms
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+.cursor/

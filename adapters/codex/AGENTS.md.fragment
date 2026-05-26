@@ -1,0 +1,35 @@
+
+
+---
+
+## UI Validation Kit
+
+This project has the [UI Validation Kit](https://github.com/YOUR-ORG/ui-validation-kit) installed.
+
+### What's available
+
+- **Skill:** `ui-validation` — click-through validation for iOS Simulator, Android emulator, and web. Auto-loads on triggers like "validate the app", "screenshot the UI", "test buttons work".
+- **Sub-agent:** `qa-validator` — full validation runs with cost-tiered fix triage, multi-platform sweep, structured reporting.
+
+### When to use
+
+- Quick smoke check ("does the home screen render?") → use the `ui-validation` skill in-line
+- Full validation run ("QA every screen", "test all interactions") → dispatch the `qa-validator` sub-agent
+- After any UI change to confirm nothing regressed → trigger `ui-validation`
+
+### Tooling installed
+
+| Platform | Tools |
+|---|---|
+| iOS | `xcrun simctl`, ios-simulator-mcp, XcodeBuildMCP, Maestro |
+| Android | `adb`, mobile-mcp, Maestro |
+| Web | agent-browser, Playwright MCP, Chrome DevTools MCP |
+
+### Behavior rules
+
+- **Click-through only** — never type URL paths to navigate after initial launch
+- **Fix-before-moving-on, cost-tiered** — cheap fixes in-flight, expensive ones escalate to findings
+- **Evidence-based reporting** — every PASS/FAIL cites a screenshot or video timestamp
+- **Platform-aware install** — only the MCPs for detected platforms are active
+
+See `.agents/skills/ui-validation/SKILL.md` for the full skill and `.codex/agents/qa-validator.toml` for the sub-agent.

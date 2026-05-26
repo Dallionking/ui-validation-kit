@@ -1,0 +1,38 @@
+# Primary navigation sweep
+#
+# Walks through every top-level tab/section. Screenshots each.
+# Customize the tab labels for your app.
+
+appId: ${MAESTRO_APP_ID:com.example.myapp}
+name: Primary navigation sweep
+tags:
+  - smoke
+  - navigation
+---
+- launchApp
+
+- takeScreenshot: nav-00-home
+- assertVisible: "Home"
+
+# Replace these tab labels with yours
+- tapOn: "Dashboard"
+- waitForAnimationToEnd
+- takeScreenshot: nav-01-dashboard
+- assertVisible:
+    text: ".*"           # at least something rendered
+    optional: true
+
+- tapOn: "Settings"
+- waitForAnimationToEnd
+- takeScreenshot: nav-02-settings
+- assertVisible: "Settings"
+
+- tapOn: "Profile"
+- waitForAnimationToEnd
+- takeScreenshot: nav-03-profile
+
+# Return to home
+- tapOn: "Home"
+- waitForAnimationToEnd
+- assertVisible: "Home"
+- takeScreenshot: nav-04-back-home

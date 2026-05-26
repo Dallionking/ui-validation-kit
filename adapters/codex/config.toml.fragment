@@ -1,0 +1,27 @@
+# UI Validation Kit — MCP server entries
+# Append to ~/.codex/config.toml (global) or .codex/config.toml (project)
+# The installer does this idempotently via grep-then-append.
+# Comment out the platforms you don't need.
+
+# ─── iOS ──────────────────────────────────────────────────────────────
+[mcp_servers.ios-simulator]
+command = "npx"
+args = ["-y", "ios-simulator-mcp"]
+
+[mcp_servers.xcodebuild]
+command = "npx"
+args = ["-y", "xcodebuildmcp@latest"]
+
+# ─── Cross-platform mobile (also covers iOS — pick one) ────────────────
+[mcp_servers.mobile-mcp]
+command = "npx"
+args = ["-y", "@mobilenext/mobile-mcp"]
+
+# ─── Web ──────────────────────────────────────────────────────────────
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["-y", "chrome-devtools-mcp"]

@@ -1,0 +1,37 @@
+# Codex sub-agent: qa-validator
+#
+# Full-run UI validation sub-agent for iOS Simulator, Android emulator, and web.
+# Inherits behavior from the ui-validation skill at .agents/skills/ui-validation/SKILL.md.
+
+name = "qa-validator"
+description = """
+Full-run UI validation sub-agent. Dispatched by the orchestrator for end-to-end \
+click-through validation across iOS Simulator, Android emulator, or web. Owns the \
+cost-tiered fix triage, multi-platform sweep coordination, evidence collection, \
+and structured reporting. Use when the user asks for a "full validation", \
+"QA the app", "click through every screen", or "end-to-end UI test".
+"""
+
+# Inherit from the skill — the sub-agent's full instructions live there
+skills = ["ui-validation"]
+
+# Tooling
+allowed_tools = ["bash", "read", "write", "edit", "glob", "grep", "agent"]
+
+# Model — Codex picks based on user config; specify only to pin
+# model = "gpt-5.5"
+
+# System prompt body — points at the canonical sub-agent definition
+system_prompt_file = "../../agent/qa-validator.md"
+
+# Triggers (optional — Codex also matches the description)
+[triggers]
+phrases = [
+  "full validation",
+  "QA the app",
+  "click through every",
+  "end-to-end UI test",
+  "deep UI sweep",
+  "validate the app",
+  "qa-validator"
+]

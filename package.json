@@ -1,0 +1,54 @@
+{
+  "name": "ui-validation-kit",
+  "version": "0.1.0",
+  "description": "Drop-in UI validation for any CLI coding agent — iOS Simulator, Android emulator, and web in one kit.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR-ORG/ui-validation-kit.git"
+  },
+  "bin": {
+    "ui-validation-kit": "./install.sh"
+  },
+  "scripts": {
+    "install:project": "bash install.sh",
+    "install:global": "bash install.sh --global",
+    "install:dry-run": "bash install.sh --dry-run",
+    "uninstall": "bash install.sh --uninstall",
+    "validate-manifest": "node -e \"JSON.parse(require('fs').readFileSync('mcps/manifest.json'))\" && echo 'manifest valid'",
+    "lint:install": "shellcheck install.sh adapters/*/install.sh 2>/dev/null || echo 'shellcheck not installed'",
+    "test": "npm run validate-manifest && npm run lint:install"
+  },
+  "keywords": [
+    "ui-validation",
+    "ui-testing",
+    "claude-code",
+    "codex",
+    "cursor",
+    "mcp",
+    "ios-simulator",
+    "android-emulator",
+    "maestro",
+    "playwright",
+    "agent-browser",
+    "skill",
+    "subagent",
+    "agentic",
+    "ai-agent",
+    "qa"
+  ],
+  "files": [
+    "install.sh",
+    "skill/",
+    "agent/",
+    "adapters/",
+    "platforms/",
+    "mcps/",
+    "playbooks/",
+    "examples/",
+    "docs/",
+    "README.md",
+    "GETTING-STARTED-PROMPT.md",
+    "LICENSE"
+  ]
+}

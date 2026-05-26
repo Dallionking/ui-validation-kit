@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Validation Kit Demo App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, system-ui, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+    nav { display: flex; gap: 1rem; padding: 1rem 2rem; background: #1a1a1a; border-bottom: 1px solid #333; }
+    nav a, nav button { color: #fff; background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; }
+    nav a:hover, nav button:hover { background: #333; }
+    nav a.active { background: #4f46e5; }
+    main { max-width: 800px; margin: 2rem auto; padding: 2rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    button.primary { background: #4f46e5; color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+    .toggle { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #333; }
+    .switch { width: 44px; height: 24px; background: #444; border-radius: 12px; position: relative; cursor: pointer; }
+    .switch.on { background: #4f46e5; }
+    .switch::after { content: ''; width: 20px; height: 20px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left 0.2s; }
+    .switch.on::after { left: 22px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #1a1a1a; padding: 2rem; border-radius: 12px; min-width: 320px; }
+    .page { display: none; }
+    .page.active { display: block; }
+  </style>
+</head>
+<body>
+  <nav aria-label="primary">
+    <a href="#" data-route="home" class="active">Home</a>
+    <a href="#" data-route="dashboard">Dashboard</a>
+    <a href="#" data-route="settings">Settings</a>
+  </nav>
+
+  <main>
+    <section class="page active" data-page="home">
+      <h1>Welcome</h1>
+      <div class="card"><p>This is a tiny demo app used by the UI Validation Kit's recording script.</p></div>
+      <div class="card"><p>Try clicking Dashboard or Settings in the nav above.</p></div>
+    </section>
+
+    <section class="page" data-page="dashboard">
+      <h1>Dashboard</h1>
+      <div class="card">
+        <p>Total users: 1,234</p>
+        <p style="margin: 1rem 0;">Active sessions: 42</p>
+        <button class="primary" id="create-new">Create New</button>
+      </div>
+    </section>
+
+    <section class="page" data-page="settings">
+      <h1>Settings</h1>
+      <div class="card">
+        <div class="toggle"><span>Dark mode</span><div class="switch on" id="theme-toggle" role="switch" aria-checked="true"></div></div>
+        <div class="toggle"><span>Notifications</span><div class="switch" id="notifications-toggle" role="switch" aria-checked="false"></div></div>
+        <div class="toggle"><span>Analytics</span><div class="switch" id="analytics-toggle" role="switch" aria-checked="false"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="modal-title">
+      <h2 id="modal-title">Create New</h2>
+      <p style="margin: 1rem 0;">This is a demo modal. The validation kit interacts with this.</p>
+      <button class="primary" id="modal-close">Close</button>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+    function navigate(route) {
+      document.querySelectorAll('nav a').forEach(function (a) { a.classList.toggle('active', a.dataset.route === route); });
+      document.querySelectorAll('.page').forEach(function (p) { p.classList.toggle('active', p.dataset.page === route); });
+    }
+    function openModal() { var m = document.getElementById('modal'); m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); }
+    function closeModal() { var m = document.getElementById('modal'); m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); }
+    function toggleSwitch(el) { var on = el.classList.toggle('on'); el.setAttribute('aria-checked', String(on)); }
+    document.querySelectorAll('nav a').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); navigate(a.dataset.route); }); });
+    document.getElementById('create-new').addEventListener('click', openModal);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    ['theme-toggle', 'notifications-toggle', 'analytics-toggle'].forEach(function (id) {
+      document.getElementById(id).addEventListener('click', function (e) { toggleSwitch(e.currentTarget); });
+    });
+  </script>
+</body>
+</html>

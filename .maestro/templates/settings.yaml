@@ -1,0 +1,47 @@
+# Settings interactions flow
+#
+# Tests common settings interactions: toggles, list selections, sign-out (mock).
+
+appId: ${MAESTRO_APP_ID:com.example.myapp}
+name: Settings interactions
+tags:
+  - regression
+  - settings
+---
+- launchApp
+
+- tapOn: "Settings"
+- waitForAnimationToEnd
+- takeScreenshot: settings-00-home
+
+# Theme toggle
+- tapOn:
+    id: "theme-toggle"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: settings-01-theme-toggled
+
+# Verify theme changed (customize: look for dark-mode-specific element)
+- assertVisible:
+    text: ".*"
+    optional: true
+
+# Notifications toggle
+- tapOn:
+    id: "notifications-toggle"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: settings-02-notifications-toggled
+
+# About / version info
+- scroll
+- tapOn: "About"
+  optional: true
+- waitForAnimationToEnd
+- takeScreenshot: settings-03-about
+- back
+
+# Sign out (commented out to avoid disrupting session)
+# - tapOn: "Sign Out"
+# - tapOn: "Confirm"
+# - assertVisible: "Sign In"

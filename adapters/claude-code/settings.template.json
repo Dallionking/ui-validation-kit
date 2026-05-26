@@ -1,0 +1,25 @@
+{
+  "_comment": "Copy or merge this into .claude/settings.json (project) or ~/.claude/settings.json (global). The installer does this idempotently via python3 json.dump.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "_comment": "Suggest a UI validation run after editing user-facing files.",
+        "matcher": "Edit|Write",
+        "filePatterns": [
+          "**/*.tsx",
+          "**/*.jsx",
+          "**/*.swift",
+          "**/*.kt",
+          "**/*.kts",
+          "**/*.css",
+          "**/*.scss",
+          "**/*.vue",
+          "**/*.svelte",
+          "**/*.dart"
+        ],
+        "command": "printf '\\033[33m[ui-kit]\\033[0m UI file changed. Consider: \"validate the affected screen with ui-validation\"\\n' >&2",
+        "blocking": false
+      }
+    ]
+  }
+}

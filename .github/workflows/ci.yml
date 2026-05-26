@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate kit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate manifest JSON
+        run: |
+          jq empty mcps/manifest.json
+          echo "manifest.json is valid JSON"
+
+      - name: Shellcheck install.sh
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: warning
+
+      - name: Lint markdown frontmatter
+        run: |
+          head -10 skill/SKILL.md | grep -q "^name:"
+          head -10 skill/SKILL.md | grep -q "^description:"
+          echo "skill/SKILL.md frontmatter OK"
+          head -10 agent/qa-validator.md | grep -q "^name:"
+          head -10 agent/qa-validator.md | grep -q "^description:"
+          echo "agent/qa-validator.md frontmatter OK"
+
+      - name: Verify adapter coverage
+        run: |
+          for adapter in claude-code codex cursor generic; do
+            test -d "adapters/$adapter" || { echo "missing adapter: $adapter"; exit 1; }
+            test -f "adapters/$adapter/README.md" || { echo "missing adapters/$adapter/README.md"; exit 1; }
+          done
+          echo "All adapters present"
+
+      - name: Verify platform coverage
+        run: |
+          for platform in ios android web expo; do
+            test -f "platforms/$platform.md" || { echo "missing platforms/$platform.md"; exit 1; }
+          done
+          echo "All platforms present"
+
+      - name: Verify playbooks present
+        run: |
+          for pb in golden-path visual-regression accessibility-audit flaky-debug; do
+            test -f "playbooks/$pb.md" || { echo "missing playbooks/$pb.md"; exit 1; }
+          done
+          echo "All playbooks present"
+
+      - name: Dry-run install
+        run: bash install.sh --dry-run --target=generic

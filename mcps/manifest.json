@@ -1,0 +1,77 @@
+{
+  "$schema": "https://raw.githubusercontent.com/YOUR-ORG/ui-validation-kit/main/mcps/schema.json",
+  "version": "0.1.0",
+  "description": "Portable mcpServers shape — every harness consumes some flavor of this. Keyed by platform to allow selective install.",
+  "mcpServers": {
+    "ios-simulator": {
+      "command": "npx",
+      "args": ["-y", "ios-simulator-mcp"],
+      "env": {},
+      "_notes": "joshuayoes/ios-simulator-mcp — taps, screenshots, accessibility queries. Requires Facebook IDB: brew install idb-companion"
+    },
+    "xcodebuild": {
+      "command": "npx",
+      "args": ["-y", "xcodebuildmcp@latest"],
+      "env": {},
+      "_notes": "cameroncooke/XcodeBuildMCP — build, install, launch, recordVideo, log capture"
+    },
+    "mobile-mcp": {
+      "command": "npx",
+      "args": ["-y", "@mobilenext/mobile-mcp"],
+      "env": {},
+      "_notes": "mobile-next/mobile-mcp — cross-platform iOS + Android, sim/emu/real device. Accessibility snapshots or coordinate taps."
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "env": {},
+      "_notes": "microsoft/playwright-mcp — Chromium/WebKit/Firefox driving"
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp"],
+      "env": {},
+      "_notes": "ChromeDevTools/chrome-devtools-mcp — Web Vitals, console, network, CPU emulation"
+    }
+  },
+  "platforms": {
+    "_note": "Mobile platforms ship with agent-device as the PRIMARY tool (a CLI, not an MCP). The MCPs listed here are FALLBACK servers only registered if the user opts in.",
+    "ios": [],
+    "android": [],
+    "expo": [],
+    "react-native": [],
+    "web": ["playwright", "chrome-devtools"]
+  },
+  "fallback_mcps": {
+    "_note": "Only register these if the user explicitly opts in (--include-fallback-mcps).",
+    "ios": ["ios-simulator", "xcodebuild", "mobile-mcp"],
+    "android": ["mobile-mcp"],
+    "expo": ["mobile-mcp"],
+    "react-native": ["mobile-mcp"]
+  },
+  "cli_tools": {
+    "_note": "Primary tools per platform. The installer always tries these first.",
+    "ios": [
+      { "name": "xcode-select", "check": "xcode-select -p", "install": "xcode-select --install" },
+      { "name": "agent-device", "check": "command -v agent-device", "install": "npm install -g agent-device@latest", "primary": true },
+      { "name": "maestro", "check": "command -v maestro", "install": "curl -Ls 'https://get.maestro.mobile.dev' | bash" },
+      { "name": "idb-companion", "check": "command -v idb", "install": "brew install idb-companion", "_only_for": "fallback MCPs" }
+    ],
+    "android": [
+      { "name": "adb", "check": "command -v adb", "install": "brew install android-platform-tools" },
+      { "name": "agent-device", "check": "command -v agent-device", "install": "npm install -g agent-device@latest", "primary": true },
+      { "name": "maestro", "check": "command -v maestro", "install": "curl -Ls 'https://get.maestro.mobile.dev' | bash" }
+    ],
+    "expo": [
+      { "name": "agent-device", "check": "command -v agent-device", "install": "npm install -g agent-device@latest", "primary": true },
+      { "name": "maestro", "check": "command -v maestro", "install": "curl -Ls 'https://get.maestro.mobile.dev' | bash" }
+    ],
+    "react-native": [
+      { "name": "agent-device", "check": "command -v agent-device", "install": "npm install -g agent-device@latest", "primary": true },
+      { "name": "maestro", "check": "command -v maestro", "install": "curl -Ls 'https://get.maestro.mobile.dev' | bash" }
+    ],
+    "web": [
+      { "name": "agent-browser", "check": "command -v agent-browser", "install": "npm install -g agent-browser", "primary": true }
+    ]
+  }
+}
