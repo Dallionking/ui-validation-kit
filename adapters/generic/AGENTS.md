@@ -3,7 +3,7 @@
 
 ## UI Validation Kit
 
-This project uses the [UI Validation Kit](https://github.com/YOUR-ORG/ui-validation-kit) for click-through UI validation across iOS Simulator, Android emulator, and web.
+This project uses the [UI Validation Kit](https://github.com/Dallionking/ui-validation-kit) for click-through UI validation across iOS Simulator, Android emulator, and web.
 
 ### When to invoke
 

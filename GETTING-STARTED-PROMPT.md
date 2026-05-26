@@ -20,11 +20,11 @@ You are installing the **UI Validation Kit** — a skill + QA sub-agent that let
 If you have network + filesystem access, clone the repo:
 
 ```bash
-git clone https://github.com/YOUR-ORG/ui-validation-kit /tmp/ui-validation-kit
+git clone https://github.com/Dallionking/ui-validation-kit /tmp/ui-validation-kit
 cd /tmp/ui-validation-kit
 ```
 
-Otherwise, fetch the raw files you need from `https://raw.githubusercontent.com/YOUR-ORG/ui-validation-kit/main/...`.
+Otherwise, fetch the raw files you need from `https://raw.githubusercontent.com/Dallionking/ui-validation-kit/main/...`.
 
 ## Step 2 — Detect the harness
 

@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR-ORG/ui-validation-kit.git"
+    "url": "https://github.com/Dallionking/ui-validation-kit.git"
   },
   "bin": {
     "ui-validation-kit": "./install.sh"

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/YOUR-ORG/ui-validation-kit/main/mcps/schema.json",
+  "$schema": "https://raw.githubusercontent.com/Dallionking/ui-validation-kit/main/mcps/schema.json",
   "version": "0.1.0",
   "description": "Portable mcpServers shape — every harness consumes some flavor of this. Keyed by platform to allow selective install.",
   "mcpServers": {

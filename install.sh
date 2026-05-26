@@ -27,7 +27,7 @@ set -eo pipefail
 # ───────────────────────────────────────────────────────────────────────
 
 KIT_VERSION="0.1.0"
-KIT_REPO_URL="${KIT_REPO_URL:-https://github.com/YOUR-ORG/ui-validation-kit}"
+KIT_REPO_URL="${KIT_REPO_URL:-https://github.com/Dallionking/ui-validation-kit}"
 KIT_BRANCH="${KIT_BRANCH:-main}"
 INSTALL_TARGET="${INSTALL_TARGET:-auto}"
 

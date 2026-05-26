@@ -27,7 +27,7 @@ This kit is the integration: skill + sub-agent + auto-install per harness + plat
 **One-liner (humans):**
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/YOUR-ORG/ui-validation-kit/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Dallionking/ui-validation-kit/main/install.sh)
 ```
 
 Auto-detects which agent harness(es) you have (Claude Code, Codex, Cursor) and installs the skill, sub-agent, and MCPs into each. Project-scope by default; `--global` for user-scope.
@@ -35,7 +35,7 @@ Auto-detects which agent harness(es) you have (Claude Code, Codex, Cursor) and i
 **Or paste this to your agent:**
 
 ```
-Read https://github.com/YOUR-ORG/ui-validation-kit and install it. Follow GETTING-STARTED-PROMPT.md.
+Read https://github.com/Dallionking/ui-validation-kit and install it. Follow GETTING-STARTED-PROMPT.md.
 ```
 
 The agent will clone, detect the platform stack (iOS/Android/web/Expo), install the required MCPs, register the skill + QA sub-agent, and run a smoke validation on the current app.
@@ -66,7 +66,7 @@ After installing the MCPs above, copy the rule:
 
 ```bash
 mkdir -p .cursor/rules
-curl -fsSL https://raw.githubusercontent.com/YOUR-ORG/ui-validation-kit/main/adapters/cursor/rules/ui-validation.mdc > .cursor/rules/ui-validation.mdc
+curl -fsSL https://raw.githubusercontent.com/Dallionking/ui-validation-kit/main/adapters/cursor/rules/ui-validation.mdc > .cursor/rules/ui-validation.mdc
 ```
 
 ---
@@ -163,7 +163,7 @@ ui-validation-kit/
 ## Uninstall
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/YOUR-ORG/ui-validation-kit/main/install.sh) --uninstall
+bash <(curl -fsSL https://raw.githubusercontent.com/Dallionking/ui-validation-kit/main/install.sh) --uninstall
 ```
 
 Removes skill files, sub-agent files, and MCP entries from any harness. Leaves your project's UI code alone.
