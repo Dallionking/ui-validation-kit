@@ -1,5 +1,16 @@
 {
+  "_comment": "PRIMARY tools (agent-device, agent-browser, Maestro) are CLIs and do NOT need MCP registration — install via npm/brew. The MCPs below are FALLBACK / OPTIONAL — register only if you specifically want them.",
   "mcpServers": {
+    "_comment_web": "Web fallback — cross-browser via Playwright, perf diagnostics via Chrome DevTools. Useful additions even if agent-browser is primary.",
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp"]
+    },
+    "_comment_mobile_fallback": "Mobile fallback MCPs — register ONLY if agent-device is unavailable. Most users do not need these.",
     "ios-simulator": {
       "command": "npx",
       "args": ["-y", "ios-simulator-mcp"]
@@ -11,14 +22,6 @@
     "mobile-mcp": {
       "command": "npx",
       "args": ["-y", "@mobilenext/mobile-mcp"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    },
-    "chrome-devtools": {
-      "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp"]
     }
   }
 }

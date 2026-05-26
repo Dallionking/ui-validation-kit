@@ -35,12 +35,11 @@ Whenever the user asks to:
 
 ### Tools by platform
 
-| Platform | Primary | Secondary |
+| Platform | Primary | Optional / fallback |
 |---|---|---|
-| iOS | `xcrun simctl`, ios-simulator-mcp | XcodeBuildMCP, Maestro |
-| Android | `adb`, mobile-mcp | Maestro |
-| Web | agent-browser | Playwright MCP, Chrome DevTools MCP |
-| Cross-platform | Maestro CLI | — |
+| iOS / Android / tvOS / desktop | [`agent-device`](https://github.com/callstackincubator/agent-device) (Callstack) — one CLI, `@eN` refs | `xcrun simctl`, `adb`, ios-simulator-mcp, XcodeBuildMCP, mobile-mcp |
+| Web | [`agent-browser`](https://github.com/vercel-labs/agent-browser) (Vercel Labs) — `@eN` refs, Web Vitals, React DevTools | Playwright MCP, Chrome DevTools MCP |
+| Cross-platform declarative flows | [Maestro](https://maestro.dev) + Maestro Viewer (CLI 2.6.0+) | — |
 
 ### Workflow
 
@@ -56,21 +55,22 @@ Whenever the user asks to:
 
 ### Cost-tier triage
 
-When a click/tap doesn't behave as expected:
+Follow the **canonical triage rules in the kit's `skill/SKILL.md` and `agent/qa-validator.md`**. The headline policy:
 
 **CHEAP — fix in-flight (max 3 attempts, 90s wall-clock each):**
-- Single-file CSS/JSX/handler changes
+- Single-file changes (CSS/JSX/SwiftUI modifier/Compose attribute)
 - Missing `onPress` / `onClick` handler
 - Style typos
-- Missing `accessibilityLabel`
+- Missing `accessibilityLabel` / `aria-label`
 - Wrong import paths
 
 **EXPENSIVE — escalate to findings, do not fix:**
 - Native module rebuild required
 - Cross-file refactor (>1 file)
-- Build config changes
-- Dependency upgrades
+- Build config / dependency changes
 - New native permissions
+
+> See `skill/SKILL.md` § Cost-tier triage for the authoritative rubric. If the user has filled in the TODO in `agent/qa-validator.md`, those rules take precedence over the summary above.
 
 ### Report format
 

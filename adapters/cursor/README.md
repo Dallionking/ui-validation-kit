@@ -45,13 +45,13 @@ Cursor rules with `description` are auto-attached based on context. The kit's ru
 
 ## One-click MCP install (Cursor 0.45+)
 
-Cursor supports deeplink MCP installs. The README has an "Install in Cursor" button that uses:
+Cursor supports deeplink MCP installs. The canonical deeplink set is in the [root README](../../README.md#one-click-mcp-install-cursor-045--fallback-layer). Each link looks like:
 
 ```
 cursor://install-mcp?name=ios-simulator&config=<base64-of-server-config>
 ```
 
-For the kit, the canonical deeplink set lives in `cursor-deeplinks.md` (TODO — add for v0.2.0).
+Click the buttons in the root README to install each MCP directly into Cursor.
 
 ## Verification
 

@@ -37,10 +37,13 @@ You are validating a UI by driving it like a real user.
 
 ## Tools by platform
 
-- **iOS:** `xcrun simctl`, ios-simulator-mcp, XcodeBuildMCP, Maestro
-- **Android:** `adb`, mobile-mcp, Maestro
-- **Web:** agent-browser (primary), Playwright MCP, Chrome DevTools MCP
-- **Cross-platform flow:** Maestro YAML
+- **Mobile / TV / desktop (PRIMARY):** [`agent-device`](https://github.com/callstackincubator/agent-device) — one CLI for iOS Simulator, Android Emulator, physical devices, tvOS, Android TV, macOS, Linux. `@eN` accessibility refs, screenshots, video, logs, network, replay scripts (`.ad`), React Native introspection. Install: `npm install -g agent-device@latest`.
+- **Web (PRIMARY):** [`agent-browser`](https://github.com/vercel-labs/agent-browser) — `@eN` refs, Web Vitals, React DevTools, video recording. Install: `npm install -g agent-browser`.
+- **Cross-platform declarative flows:** [Maestro](https://maestro.dev) + Maestro Viewer (CLI 2.6.0+ — live device inside the agent). Install: `curl -Ls 'https://get.maestro.mobile.dev' | bash`.
+- **iOS raw control:** `xcrun simctl` (built-in with Xcode) — status_bar override, push, pre-grant permissions
+- **Android raw control:** `adb` (Android Platform Tools) — logcat, install, screenrecord
+- **Web cross-browser fallback:** Playwright MCP (Firefox / WebKit), Chrome DevTools MCP (perf)
+- **Mobile fallback MCPs (only if `agent-device` unavailable):** `ios-simulator-mcp`, `mobile-mcp`, `XcodeBuildMCP`
 
 ## Workflow
 
@@ -56,21 +59,22 @@ You are validating a UI by driving it like a real user.
 
 ## Cost-tier triage
 
-When a click/tap doesn't behave as expected:
+When a click/tap doesn't behave as expected, follow the **canonical triage rules in `skill/SKILL.md` and `agent/qa-validator.md`**. The headline policy:
 
 **CHEAP — fix in-flight (max 3 attempts, 90s wall-clock each):**
-- Single-file CSS/JSX/handler changes
+- Single-file changes (CSS/JSX/SwiftUI modifier/Compose attribute)
 - Missing `onPress` / `onClick` handler
 - Style typos
-- Missing `accessibilityLabel`
+- Missing `accessibilityLabel` / `aria-label`
 - Wrong import paths
 
 **EXPENSIVE — escalate to findings, do not fix:**
 - Native module rebuild required
 - Cross-file refactor (>1 file)
-- Build config changes
-- Dependency upgrades
+- Build config / dependency changes
 - New native permissions
+
+> See `skill/SKILL.md` § Cost-tier triage for the authoritative rubric. If users customize `agent/qa-validator.md`'s TODO block, those rules take precedence over the summary above.
 
 ## Report format
 

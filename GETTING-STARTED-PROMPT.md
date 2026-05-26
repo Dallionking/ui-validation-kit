@@ -54,76 +54,76 @@ Read these files in the current project to identify the stack:
 
 Record what you found. You'll install only relevant MCPs.
 
-## Step 4 — Install platform tooling
+## Step 4 — Install primary tools (CLIs, no MCP needed)
 
-### iOS (if detected)
+The primary tools are CLIs that any agent can call. No MCP registration required.
+
+### Mobile / TV / desktop (if iOS / Android / Expo / RN / Flutter detected)
 
 ```bash
-# 1. Verify Xcode + simulator are installed
+# 1. agent-device — primary mobile/TV/desktop CLI (Callstack)
+npm install -g agent-device@latest
+agent-device --version
+
+# 2. Maestro + Maestro Viewer (declarative cross-platform flows)
+command -v maestro || curl -Ls "https://get.maestro.mobile.dev" | bash
+maestro --version  # should be >= 2.6.0 for Maestro Viewer
+
+# 3. Platform prerequisites
+# iOS
 xcode-select -p || (echo "Install Xcode first" && exit 1)
-xcrun simctl list devices | head -20
+xcrun simctl list devices | head -10
 
-# 2. Install Facebook IDB (required by ios-simulator-mcp)
-brew tap facebook/fb 2>/dev/null || true
-brew install idb-companion
-
-# 3. Verify Maestro
-command -v maestro || curl -Ls "https://get.maestro.mobile.dev" | bash
-```
-
-### Android (if detected)
-
-```bash
-# 1. Verify adb
-command -v adb || (echo "Install Android Platform Tools" && exit 1)
-
-# 2. List running emulators
+# Android
+command -v adb || (echo "Install: brew install android-platform-tools" && exit 1)
 adb devices
-
-# 3. Verify Maestro (cross-platform)
-command -v maestro || curl -Ls "https://get.maestro.mobile.dev" | bash
 ```
 
 ### Web (if detected)
 
 ```bash
-# 1. Install agent-browser (primary)
+# 1. agent-browser — primary web CLI (Vercel Labs)
 npm install -g agent-browser || cargo install agent-browser || brew install agent-browser
-
-# 2. Playwright (for cross-browser)
-npx playwright install --with-deps chromium
+agent-browser --version
 ```
 
-## Step 5 — Register MCPs
+## Step 5 — Register MCPs (fallback only, optional)
 
-Read `mcps/manifest.json` from the kit. It contains the portable `mcpServers` shape per platform.
+**The primary tools above are CLIs and need no MCP registration.** Skip this step unless you specifically need the fallback MCPs.
+
+If you want the fallback MCPs (only useful if `agent-device` / `agent-browser` are unavailable or you want extra surface area like Playwright cross-browser):
 
 ### Claude Code
 
-For each MCP in the manifest relevant to detected platforms:
-
 ```bash
-claude mcp add ios-simulator --scope user -- npx -y ios-simulator-mcp
-claude mcp add xcodebuild --scope user -- npx -y xcodebuildmcp@latest
-claude mcp add mobile-mcp --scope user -- npx -y @mobilenext/mobile-mcp
+# Web fallback (cross-browser via Playwright; Chrome DevTools for perf diagnostics)
 claude mcp add playwright --scope user -- npx -y @playwright/mcp@latest
 claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp
+
+# Mobile fallback MCPs (only if agent-device unavailable)
+# claude mcp add ios-simulator --scope user -- npx -y ios-simulator-mcp
+# claude mcp add xcodebuild --scope user -- npx -y xcodebuildmcp@latest
+# claude mcp add mobile-mcp --scope user -- npx -y @mobilenext/mobile-mcp
 ```
 
 ### Codex CLI
 
-Append to `~/.codex/config.toml`:
+Append to `~/.codex/config.toml` (or `.codex/config.toml` for project scope):
 
 ```toml
-[mcp_servers.ios-simulator]
+# Web fallback
+[mcp_servers.playwright]
 command = "npx"
-args = ["-y", "ios-simulator-mcp"]
+args = ["-y", "@playwright/mcp@latest"]
 
-[mcp_servers.xcodebuild]
+[mcp_servers.chrome-devtools]
 command = "npx"
-args = ["-y", "xcodebuildmcp@latest"]
+args = ["-y", "chrome-devtools-mcp"]
 
-# ...etc per platform
+# Mobile fallback (only if agent-device unavailable)
+# [mcp_servers.ios-simulator]
+# command = "npx"
+# args = ["-y", "ios-simulator-mcp"]
 ```
 
 ### Cursor
@@ -133,8 +133,8 @@ Merge into `~/.cursor/mcp.json` (or `.cursor/mcp.json` for project scope):
 ```json
 {
   "mcpServers": {
-    "ios-simulator": { "command": "npx", "args": ["-y", "ios-simulator-mcp"] },
-    "xcodebuild": { "command": "npx", "args": ["-y", "xcodebuildmcp@latest"] }
+    "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@latest"] },
+    "chrome-devtools": { "command": "npx", "args": ["-y", "chrome-devtools-mcp"] }
   }
 }
 ```
@@ -215,9 +215,11 @@ Try it: "validate the home screen" or "click through every button on the setting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `ios-simulator-mcp` errors on launch | Facebook IDB missing | `brew install idb-companion` |
+| `agent-device` not found | npm install failed or not on PATH | `npm install -g agent-device@latest` then check `which agent-device` |
+| `agent-browser` not found | Not on PATH | Reinstall via `npm install -g agent-browser`, check `which agent-browser` |
 | Maestro can't find device | Simulator not booted | `xcrun simctl boot booted` or open Simulator.app |
-| `agent-browser` not found | Not on PATH | Reinstall, check `which agent-browser` |
+| Maestro Viewer unavailable | Maestro < 2.6.0 | Upgrade: `curl -Ls 'https://get.maestro.mobile.dev' \| bash` |
+| `ios-simulator-mcp` errors on launch (fallback only) | Facebook IDB missing | `brew install idb-companion` |
 | Claude Code doesn't pick up skill | Cache | Restart Claude Code |
 | Cursor doesn't see MCP | JSON syntax | Validate `.cursor/mcp.json` |
 

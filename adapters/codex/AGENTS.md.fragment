@@ -19,11 +19,10 @@ This project has the [UI Validation Kit](https://github.com/Dallionking/ui-valid
 
 ### Tooling installed
 
-| Platform | Tools |
-|---|---|
-| iOS | `xcrun simctl`, ios-simulator-mcp, XcodeBuildMCP, Maestro |
-| Android | `adb`, mobile-mcp, Maestro |
-| Web | agent-browser, Playwright MCP, Chrome DevTools MCP |
+| Platform | Primary | Optional / fallback |
+|---|---|---|
+| iOS / Android / tvOS / desktop | `agent-device` (Callstack — one CLI, `@eN` refs) + Maestro + Maestro Viewer | `xcrun simctl`, `adb`, ios-simulator-mcp, XcodeBuildMCP, mobile-mcp |
+| Web | `agent-browser` (Vercel Labs — `@eN` refs, Web Vitals, React DevTools) | Playwright MCP, Chrome DevTools MCP |
 
 ### Behavior rules
 

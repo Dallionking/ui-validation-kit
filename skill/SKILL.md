@@ -1,6 +1,6 @@
 ---
 name: ui-validation
-description: Validate UIs by clicking through them like a real user — iOS Simulator, Android emulator, and web. Detects the platform, picks the right tools (xcrun simctl, ios-simulator-mcp, XcodeBuildMCP, mobile-mcp, agent-browser, Playwright MCP, Maestro), drives the app, screenshots and records evidence, fixes cheap bugs in-flight, escalates expensive ones. Use when the user asks to "validate the app", "click through", "screenshot the UI", "test buttons work", "run a UI smoke test", "verify the screen renders", or after any UI change to confirm nothing regressed.
+description: Validate UIs by clicking through them like a real user — iOS Simulator, Android emulator, tvOS, desktop, and web. Detects the platform and picks the right tool — `agent-device` (Callstack) for mobile/TV/desktop, `agent-browser` (Vercel Labs) for web, Maestro + Maestro Viewer for declarative cross-platform flows; raw `xcrun simctl` / `adb` for low-level control; `ios-simulator-mcp` / `mobile-mcp` / `XcodeBuildMCP` / Playwright MCP / Chrome DevTools MCP as fallbacks. Drives the app, screenshots and records evidence, fixes cheap bugs in-flight, escalates expensive ones. Use when the user asks to "validate the app", "click through", "screenshot the UI", "test buttons work", "run a UI smoke test", "verify the screen renders", or after any UI change to confirm nothing regressed.
 allowed-tools:
   - Bash
   - Read
@@ -38,8 +38,9 @@ You are a UI validation specialist. You drive applications like a real user — 
 Run this detection in order. **Stop at first match.**
 
 ```bash
-# Mobile detection
-if [[ -f "Package.swift" || -d "*.xcodeproj" ]]; then
+# Mobile detection — use compgen -G to glob unquoted, otherwise the literal
+# string "*.xcodeproj" gets tested as a path and the check silently fails.
+if [[ -f "Package.swift" ]] || compgen -G "*.xcodeproj" > /dev/null; then
   PLATFORM="ios-native"
 elif [[ -f "build.gradle" || -f "build.gradle.kts" ]]; then
   PLATFORM="android-native"

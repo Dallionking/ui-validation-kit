@@ -21,8 +21,11 @@ allowed_tools = ["bash", "read", "write", "edit", "glob", "grep", "agent"]
 # Model — Codex picks based on user config; specify only to pin
 # model = "gpt-5.5"
 
-# System prompt body — points at the canonical sub-agent definition
-system_prompt_file = "../../agent/qa-validator.md"
+# System prompt — points at the skill SKILL.md, which Codex installs alongside
+# this TOML file at .agents/skills/ui-validation/SKILL.md. We resolve to that
+# path so the sub-agent works in a consumer project (where ../../agent/... does
+# not exist).
+system_prompt_file = ".agents/skills/ui-validation/SKILL.md"
 
 # Triggers (optional — Codex also matches the description)
 [triggers]

@@ -1,23 +1,16 @@
-# UI Validation Kit — MCP server entries
-# Append to ~/.codex/config.toml (global) or .codex/config.toml (project)
+# UI Validation Kit — MCP server entries (FALLBACK / OPTIONAL)
+#
+# Append to ~/.codex/config.toml (global) or .codex/config.toml (project).
 # The installer does this idempotently via grep-then-append.
-# Comment out the platforms you don't need.
+#
+# PRIMARY TOOLS DO NOT NEED MCP REGISTRATION:
+#   - `agent-device`  (mobile / TV / desktop) — install via `npm install -g agent-device@latest`
+#   - `agent-browser` (web) — install via `npm install -g agent-browser`
+#   - `maestro`       (cross-platform flows) — install via `curl -Ls 'https://get.maestro.mobile.dev' | bash`
+#
+# The MCPs below are OPTIONAL extras. Register only what you specifically want.
 
-# ─── iOS ──────────────────────────────────────────────────────────────
-[mcp_servers.ios-simulator]
-command = "npx"
-args = ["-y", "ios-simulator-mcp"]
-
-[mcp_servers.xcodebuild]
-command = "npx"
-args = ["-y", "xcodebuildmcp@latest"]
-
-# ─── Cross-platform mobile (also covers iOS — pick one) ────────────────
-[mcp_servers.mobile-mcp]
-command = "npx"
-args = ["-y", "@mobilenext/mobile-mcp"]
-
-# ─── Web ──────────────────────────────────────────────────────────────
+# ─── Web (recommended — extra surface area alongside agent-browser) ───
 [mcp_servers.playwright]
 command = "npx"
 args = ["-y", "@playwright/mcp@latest"]
@@ -25,3 +18,16 @@ args = ["-y", "@playwright/mcp@latest"]
 [mcp_servers.chrome-devtools]
 command = "npx"
 args = ["-y", "chrome-devtools-mcp"]
+
+# ─── Mobile fallback MCPs (commented out — register only if agent-device unavailable) ───
+# [mcp_servers.ios-simulator]
+# command = "npx"
+# args = ["-y", "ios-simulator-mcp"]
+#
+# [mcp_servers.xcodebuild]
+# command = "npx"
+# args = ["-y", "xcodebuildmcp@latest"]
+#
+# [mcp_servers.mobile-mcp]
+# command = "npx"
+# args = ["-y", "@mobilenext/mobile-mcp"]

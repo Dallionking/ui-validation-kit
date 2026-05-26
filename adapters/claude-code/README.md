@@ -22,14 +22,25 @@ cp ../../skill/SKILL.md .claude/skills/ui-validation/SKILL.md
 mkdir -p .claude/agents
 cp ../../agent/qa-validator.md .claude/agents/qa-validator.md
 
-# 3. MCPs (only the ones your project needs)
-claude mcp add ios-simulator --scope project -- npx -y ios-simulator-mcp
-claude mcp add xcodebuild --scope project -- npx -y xcodebuildmcp@latest
-claude mcp add mobile-mcp --scope project -- npx -y @mobilenext/mobile-mcp
+# 3. Primary tools (CLIs — no MCP registration needed)
+npm install -g agent-device@latest         # mobile / TV / desktop
+npm install -g agent-browser               # web
+command -v maestro || curl -Ls 'https://get.maestro.mobile.dev' | bash   # cross-platform flows
+
+# 4. Optional MCPs (only register fallback MCPs if you specifically want them)
+#    The primary tools above are CLIs that Claude Code can shell-out to directly.
+#    Register the lines below ONLY if you want extra surface area:
+
+# Web (Playwright cross-browser + Chrome DevTools for perf):
 claude mcp add playwright --scope project -- npx -y @playwright/mcp@latest
 claude mcp add chrome-devtools --scope project -- npx -y chrome-devtools-mcp
 
-# 4. Verify
+# Mobile fallback MCPs (commented out — only register if agent-device unavailable):
+# claude mcp add ios-simulator --scope project -- npx -y ios-simulator-mcp
+# claude mcp add xcodebuild --scope project -- npx -y xcodebuildmcp@latest
+# claude mcp add mobile-mcp --scope project -- npx -y @mobilenext/mobile-mcp
+
+# 5. Verify
 claude mcp list
 ```
 

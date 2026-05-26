@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/Dallionking/ui-validation-kit/main/mcps/schema.json",
   "version": "0.1.0",
   "description": "Portable mcpServers shape — every harness consumes some flavor of this. Keyed by platform to allow selective install.",
   "mcpServers": {
@@ -43,7 +42,7 @@
     "web": ["playwright", "chrome-devtools"]
   },
   "fallback_mcps": {
-    "_note": "Only register these if the user explicitly opts in (--include-fallback-mcps).",
+    "_note": "Fallback MCPs — register only if `agent-device` is unavailable. install.sh does NOT register these by default; users opt in by registering them manually (see adapters/<harness>/README.md) or by setting INSTALL_FALLBACK_MCPS=1 before running install.sh.",
     "ios": ["ios-simulator", "xcodebuild", "mobile-mcp"],
     "android": ["mobile-mcp"],
     "expo": ["mobile-mcp"],

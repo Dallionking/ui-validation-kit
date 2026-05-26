@@ -22,3 +22,7 @@ Thumbs.db
 *.swp
 *~
 .cursor/
+
+# Sigma Protocol sprint/pipeline state (local, not committed)
+.pipeline-state.json
+.sprint-state.json

@@ -35,6 +35,7 @@ SCOPE="project"
 DRY_RUN=0
 UNINSTALL=0
 FORCE=0
+INSTALL_FALLBACK_MCPS="${INSTALL_FALLBACK_MCPS:-0}"
 KIT_DIR=""
 
 # ───────────────────────────────────────────────────────────────────────
@@ -71,6 +72,7 @@ for arg in "$@"; do
     --uninstall)         UNINSTALL=1 ;;
     --force)             FORCE=1 ;;
     --target=*)          INSTALL_TARGET="${arg#--target=}" ;;
+    --include-fallback-mcps) INSTALL_FALLBACK_MCPS=1 ;;
     -h|--help)
       sed -n '2,20p' "$0"; exit 0 ;;
     *)
@@ -163,13 +165,18 @@ resolve_kit_dir() {
     return
   fi
 
-  # Otherwise, clone to a temp dir
+  # Otherwise, clone to a temp dir. In dry-run mode, don't create the tmp dir
+  # or clone — just print what would happen and exit.
+  if [[ $DRY_RUN -eq 1 ]]; then
+    log "DRY RUN: would clone $KIT_REPO_URL → \$(mktemp -d) and use that as kit source."
+    log "DRY RUN: To see realistic dry-run output, run from inside a kit checkout."
+    exit 0
+  fi
+
   local tmp; tmp="$(mktemp -d -t ui-validation-kit.XXXXXX)"
   log "Cloning $KIT_REPO_URL → $tmp"
-  if [[ $DRY_RUN -eq 0 ]]; then
-    git clone --depth 1 --branch "$KIT_BRANCH" "$KIT_REPO_URL" "$tmp" >/dev/null 2>&1 \
-      || { err "Failed to clone kit. Set KIT_REPO_URL or run from inside a checkout."; exit 1; }
-  fi
+  git clone --depth 1 --branch "$KIT_BRANCH" "$KIT_REPO_URL" "$tmp" >/dev/null 2>&1 \
+    || { err "Failed to clone kit. Set KIT_REPO_URL or run from inside a checkout."; exit 1; }
   KIT_DIR="$tmp"
 }
 
@@ -192,11 +199,9 @@ install_agent_device() {
 
 install_ios_tooling() {
   step "Installing iOS tooling"
-  if ! command -v xcode-select >/dev/null 2>&1; then
-    err "Xcode command-line tools not found. Skipping iOS install. Run: xcode-select --install"
-    return 0
-  fi
 
+  # agent-device and Maestro are platform-agnostic — install them first so an
+  # Android-only Expo/RN setup still gets them even when Xcode is missing.
   install_agent_device
 
   if ! command -v maestro >/dev/null 2>&1; then
@@ -205,16 +210,18 @@ install_ios_tooling() {
   else
     ok "Maestro already installed"
   fi
+
+  if ! command -v xcode-select >/dev/null 2>&1; then
+    warn "Xcode command-line tools not found. iOS-specific control (simctl) unavailable. Run: xcode-select --install"
+    return 0
+  fi
+  ok "Xcode command-line tools available"
 }
 
 install_android_tooling() {
   step "Installing Android tooling"
-  if ! command -v adb >/dev/null 2>&1; then
-    warn "adb not found. Skipping Android install. (Install with: brew install android-platform-tools)"
-    return 0
-  fi
-  ok "adb available"
 
+  # Platform-agnostic tools first
   install_agent_device
 
   if ! command -v maestro >/dev/null 2>&1; then
@@ -223,6 +230,12 @@ install_android_tooling() {
   else
     ok "Maestro already installed"
   fi
+
+  if ! command -v adb >/dev/null 2>&1; then
+    warn "adb not found. Android-specific control unavailable. Install with: brew install android-platform-tools"
+    return 0
+  fi
+  ok "adb available"
 }
 
 install_web_tooling() {
@@ -246,18 +259,25 @@ install_web_tooling() {
 # ───────────────────────────────────────────────────────────────────────
 
 # Reads mcps/manifest.json and returns the relevant MCP entries for a given platform.
-# Format: JSON object keyed by mcp name.
+# Honors INSTALL_FALLBACK_MCPS — when set, also includes fallback MCPs (e.g. mobile MCPs
+# normally not registered because agent-device is primary).
 get_mcps_for_platform() {
   local platform="$1"
-  python3 - "$KIT_DIR/mcps/manifest.json" "$platform" <<'PYEOF'
+  python3 - "$KIT_DIR/mcps/manifest.json" "$platform" "$INSTALL_FALLBACK_MCPS" <<'PYEOF'
 import json, sys
 manifest = json.load(open(sys.argv[1]))
-platform = sys.argv[2]
-mcps = manifest.get("platforms", {}).get(platform, [])
+platform, include_fallback = sys.argv[2], sys.argv[3] == "1"
+mcps = list(manifest.get("platforms", {}).get(platform, []))
+if include_fallback:
+    mcps += manifest.get("fallback_mcps", {}).get(platform, [])
 for name in mcps:
+    if name.startswith("_"):
+        continue
     spec = manifest["mcpServers"].get(name)
     if spec:
-        print(f"{name}\t{json.dumps(spec)}")
+        # Strip private _-prefixed keys before serializing
+        clean = {k: v for k, v in spec.items() if not k.startswith("_")}
+        print(f"{name}\t{json.dumps(clean)}")
 PYEOF
 }
 
@@ -275,6 +295,11 @@ register_mcp_codex() {
   local name="$1"; local spec="$2"
   local config="$HOME/.codex/config.toml"
   [[ "$SCOPE" == "project" ]] && config=".codex/config.toml"
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    printf "${C_DIM}[dry-run]${C_RESET} would register Codex MCP '%s' in %s\n" "$name" "$config"
+    return
+  fi
 
   mkdir -p "$(dirname "$config")"
   touch "$config"
@@ -305,6 +330,11 @@ register_mcp_cursor() {
   local name="$1"; local spec="$2"
   local cfg="$HOME/.cursor/mcp.json"
   [[ "$SCOPE" == "project" ]] && cfg=".cursor/mcp.json"
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    printf "${C_DIM}[dry-run]${C_RESET} would register Cursor MCP '%s' in %s\n" "$name" "$cfg"
+    return
+  fi
 
   mkdir -p "$(dirname "$cfg")"
   [[ -f "$cfg" ]] || echo '{"mcpServers":{}}' > "$cfg"
@@ -369,28 +399,89 @@ install_skill_generic() {
 # Uninstall
 # ───────────────────────────────────────────────────────────────────────
 
+unregister_mcp_claude() {
+  local name="$1"
+  if [[ "$SCOPE" == "global" ]]; then
+    run "claude mcp remove '$name' --scope user 2>/dev/null || true"
+  else
+    run "claude mcp remove '$name' --scope project 2>/dev/null || true"
+  fi
+}
+
+unregister_mcp_codex() {
+  local name="$1"
+  local config="$HOME/.codex/config.toml"
+  [[ "$SCOPE" == "project" ]] && config=".codex/config.toml"
+  [[ -f "$config" ]] || return 0
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    printf "${C_DIM}[dry-run]${C_RESET} would remove [mcp_servers.%s] from %s\n" "$name" "$config"
+    return
+  fi
+
+  python3 - "$config" "$name" <<'PYEOF'
+import sys, re
+cfg, name = sys.argv[1], sys.argv[2]
+content = open(cfg).read()
+# Strip the block [mcp_servers.NAME] plus its key=value lines until next [ or EOF
+pattern = re.compile(r'(^\[mcp_servers\.' + re.escape(name) + r'\][^\[]*?)(?=^\[|\Z)', re.MULTILINE | re.DOTALL)
+new = pattern.sub('', content).rstrip() + '\n'
+open(cfg, 'w').write(new)
+PYEOF
+}
+
+unregister_mcp_cursor() {
+  local name="$1"
+  local cfg="$HOME/.cursor/mcp.json"
+  [[ "$SCOPE" == "project" ]] && cfg=".cursor/mcp.json"
+  [[ -f "$cfg" ]] || return 0
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    printf "${C_DIM}[dry-run]${C_RESET} would remove '%s' from mcpServers in %s\n" "$name" "$cfg"
+    return
+  fi
+
+  python3 - "$cfg" "$name" <<'PYEOF'
+import json, sys
+cfg, name = sys.argv[1], sys.argv[2]
+data = json.load(open(cfg))
+data.get("mcpServers", {}).pop(name, None)
+json.dump(data, open(cfg, "w"), indent=2)
+PYEOF
+}
+
 do_uninstall() {
   step "Uninstalling UI Validation Kit"
+
+  # All MCP names the kit might have registered
+  local mcps=(ios-simulator xcodebuild mobile-mcp playwright chrome-devtools)
+
   for target in "${TARGETS[@]}"; do
     case "$target" in
       claude)
         local base="$HOME/.claude"; [[ "$SCOPE" == "project" ]] && base=".claude"
         run "rm -rf '$base/skills/ui-validation' '$base/agents/qa-validator.md'"
-        ok "Claude Code: removed"
+        for m in "${mcps[@]}"; do unregister_mcp_claude "$m"; done
+        ok "Claude Code: skill, sub-agent, and MCP entries removed"
         ;;
       codex)
         local base="."; [[ "$SCOPE" == "global" ]] && base="$HOME"
         run "rm -rf '$base/.agents/skills/ui-validation' '$base/.codex/agents/qa-validator.toml'"
-        ok "Codex: removed"
+        for m in "${mcps[@]}"; do unregister_mcp_codex "$m"; done
+        ok "Codex: skill, sub-agent, and MCP entries removed"
         ;;
       cursor)
         local base="."; [[ "$SCOPE" == "global" ]] && base="$HOME"
         run "rm -f '$base/.cursor/rules/ui-validation.mdc'"
-        ok "Cursor: removed"
+        for m in "${mcps[@]}"; do unregister_mcp_cursor "$m"; done
+        ok "Cursor: rule and MCP entries removed"
+        ;;
+      generic)
+        warn "Generic install only appends to AGENTS.md — remove the '## UI Validation Kit' section manually"
         ;;
     esac
   done
-  ok "Uninstall complete. MCP entries left in place (remove manually if desired)."
+  ok "Uninstall complete."
   exit 0
 }
 
@@ -410,12 +501,24 @@ main() {
 
   [[ $UNINSTALL -eq 1 ]] && do_uninstall
 
-  # Install platform tooling
+  # Install platform tooling — Expo/RN can target iOS AND Android, install both.
+  # Portable dedup (bash 3.2 has no associative arrays — use a space-delimited string).
+  local _seen=" "
   for platform in "${PLATFORMS[@]}"; do
     case "$platform" in
-      ios|expo|react-native) install_ios_tooling ;;
-      android) install_android_tooling ;;
-      web) install_web_tooling ;;
+      ios)
+        case "$_seen" in *" ios "*) ;; *) install_ios_tooling; _seen="$_seen ios " ;; esac
+        ;;
+      android)
+        case "$_seen" in *" android "*) ;; *) install_android_tooling; _seen="$_seen android " ;; esac
+        ;;
+      expo|react-native|flutter)
+        case "$_seen" in *" ios "*) ;; *) install_ios_tooling; _seen="$_seen ios " ;; esac
+        case "$_seen" in *" android "*) ;; *) install_android_tooling; _seen="$_seen android " ;; esac
+        ;;
+      web)
+        case "$_seen" in *" web "*) ;; *) install_web_tooling; _seen="$_seen web " ;; esac
+        ;;
     esac
   done
 

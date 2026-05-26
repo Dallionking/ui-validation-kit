@@ -144,10 +144,18 @@ Rule of thumb: if the user says "validate" → skill. If they say "QA" or "deep 
 
 **This kit's gap-filling contribution:** the integration layer. `agent-device` and `agent-browser` are siblings (both use `@eN` refs), but until this kit existed, no skill knew to switch between them based on platform detection. Cross-CLI install (Claude Code / Codex / Cursor / generic AGENTS.md) and a QA sub-agent with cost-tier triage are also kit-original.
 
+## Known limitations (v0.1.0)
+
+- `install.sh`'s `run()` wrapper uses `eval` on assembled command strings. This is OK for the intended single-user `bash install.sh` flow but is unsafe if `KIT_REPO_URL` or `$HOME` contain shell metacharacters. Mitigation: don't run the installer with untrusted env vars. v0.2.0 will switch to direct argv execution.
+- Adapter files (`adapters/{cursor,generic}/...`) include summary cost-tier rules. If a user customizes the rubric in `agent/qa-validator.md`'s TODO block, the adapter summaries will drift until manually refreshed. The skill body is the authoritative source.
+- macOS-only — Linux/Windows portability of `install.sh` is best-effort but not tested in CI.
+- The bundled `mcps/manifest.json` does not list a JSON Schema. v0.2.0 will publish one at `mcps/schema.json`.
+
 ## Future work
 
+- v0.2.0 — `mcps/schema.json` for editor support
+- v0.2.0 — Switch `install.sh` `run()` to argv-based execution (kill `eval`)
 - v0.2.0 — Windows app support (UI Automation, FlaUI)
-- v0.2.0 — One-click Cursor MCP deeplinks in README
 - v0.3.0 — Vision-LLM intent diff as a first-class playbook with built-in prompts
 - v0.3.0 — CI templates (GitHub Actions, GitLab CI) for visual regression
 - v0.4.0 — Plugin marketplace listing (Claude Code's `claude plugin add ui-validation-kit`)
