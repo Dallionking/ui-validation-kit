@@ -91,17 +91,18 @@ The installer is platform-aware: only installs what your project needs. Mobile p
 
 1. **Skill** — `ui-validation` skill that loads on UI-related triggers ("validate the app", "click through test", "screenshot the home screen")
 2. **QA Sub-agent** — `qa-validator` agent the orchestrator can dispatch for full validation runs
-3. **MCP fleet** — Platform-appropriate MCPs registered with your harness
-4. **Playbooks** — Golden path, visual regression, accessibility audit, flaky-debug
-5. **Cost-tiered fix triage** — Agent fixes cheap bugs in-flight (CSS, JSX, missing handlers), bails on expensive ones (native rebuilds, cross-file refactors), reports everything
+3. **Primary CLIs** — `agent-device` (mobile/TV/desktop) + `agent-browser` (web) + Maestro (declarative flows) installed via npm/brew. No MCP registration required for the primary path.
+4. **Optional MCPs** — Playwright + Chrome DevTools MCPs registered for web by default (cross-browser + perf complements to agent-browser). Mobile fallback MCPs opt-in via `--include-fallback-mcps`.
+5. **Playbooks** — Golden path, visual regression, accessibility audit, flaky-debug
+6. **Cost-tiered fix triage** — Agent fixes cheap bugs in-flight (CSS, JSX, missing handlers), bails on expensive ones (native rebuilds, cross-file refactors), reports everything
 
 ---
 
 ## How it works
 
 1. **Detect** — Agent reads `package.json`, `Package.swift`, `build.gradle`, `app.json` to identify the stack
-2. **Install** — Pulls only the MCPs and CLI tools relevant to the detected platform
-3. **Drive** — Click-through navigation (never typing URLs / deep links) with accessibility-tree refs
+2. **Install** — Pulls the primary CLIs (`agent-device`, `agent-browser`, `maestro`) for detected platforms; optional MCPs only when relevant
+3. **Drive** — Click-through navigation (never typing URLs / deep links) with `@eN` accessibility-tree refs
 4. **Evidence** — Screenshots + video at every step, saved to `recordings/`
 5. **Fix-or-flag** — Cost-tiered triage: cheap fixes in-flight, expensive ones reported
 6. **Report** — Structured Markdown report with verdict, evidence, remaining concerns

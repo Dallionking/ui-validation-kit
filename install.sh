@@ -419,14 +419,38 @@ unregister_mcp_codex() {
     return
   fi
 
+  # Line-based deletion — the previous regex `[^\[]*?` failed because TOML
+  # values like `args = ["-y", ...]` contain `[`, which terminated the match.
+  # We scan line-by-line: find the section header, skip lines until the next
+  # `[section]` header (or EOF).
   python3 - "$config" "$name" <<'PYEOF'
-import sys, re
+import sys
 cfg, name = sys.argv[1], sys.argv[2]
-content = open(cfg).read()
-# Strip the block [mcp_servers.NAME] plus its key=value lines until next [ or EOF
-pattern = re.compile(r'(^\[mcp_servers\.' + re.escape(name) + r'\][^\[]*?)(?=^\[|\Z)', re.MULTILINE | re.DOTALL)
-new = pattern.sub('', content).rstrip() + '\n'
-open(cfg, 'w').write(new)
+target_header = f"[mcp_servers.{name}]"
+out = []
+skipping = False
+for line in open(cfg):
+    stripped = line.strip()
+    if stripped == target_header:
+        skipping = True
+        continue
+    if skipping:
+        # Stop skipping when we hit the next section header at column 0.
+        # A section header is a line starting with '[' (any TOML table).
+        # We need to look at the raw line, not the stripped one, since
+        # arrays-of-tables like `[[x]]` also count.
+        if line.lstrip().startswith('[') and not line.lstrip().startswith('[['):
+            # A new [section] starts — stop skipping, keep this line
+            skipping = False
+            out.append(line)
+        elif line.lstrip().startswith('[['):
+            skipping = False
+            out.append(line)
+        # else: still inside the target section, skip
+        continue
+    out.append(line)
+content = ''.join(out).rstrip() + '\n'
+open(cfg, 'w').write(content)
 PYEOF
 }
 

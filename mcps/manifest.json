@@ -34,7 +34,7 @@
     }
   },
   "platforms": {
-    "_note": "Mobile platforms ship with agent-device as the PRIMARY tool (a CLI, not an MCP). The MCPs listed here are FALLBACK servers only registered if the user opts in.",
+    "_note": "Default MCP registrations per platform. Mobile platforms install no MCPs by default — agent-device (a CLI) is the primary tool. Web installs Playwright + Chrome DevTools by default because they complement agent-browser with cross-browser support and perf diagnostics; they are not redundant with agent-browser.",
     "ios": [],
     "android": [],
     "expo": [],

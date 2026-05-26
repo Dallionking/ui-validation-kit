@@ -10,9 +10,9 @@ You are installing the **UI Validation Kit** — a skill + QA sub-agent that let
 
 1. **Detect the agent harness** you're running in (Claude Code, Codex CLI, Cursor, or generic AGENTS.md-based).
 2. **Detect the project stack** (iOS native, Android native, Expo/React Native, web, or hybrid).
-3. **Install only what's needed** — don't install Android tools for a pure iOS project.
+3. **Install the primary CLIs** — `agent-device` (mobile/TV/desktop), `agent-browser` (web), Maestro (declarative flows). These are CLIs that shell out from your agent — no MCP server registration needed.
 4. **Register the skill and sub-agent** in the right place for the detected harness.
-5. **Wire up the MCPs** using the harness's MCP install command.
+5. **Register optional MCPs** (Playwright, Chrome DevTools) only if the project is web. Mobile fallback MCPs are opt-in via `--include-fallback-mcps`.
 6. **Run a smoke validation** to confirm the kit works.
 
 ## Step 1 — Clone or read the kit
